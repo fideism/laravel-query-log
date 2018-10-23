@@ -6,7 +6,7 @@ return [
 
     'channel' => env('DB_LOG_CHANNEL', 'single'),
 
-    'log' => env('DB_LOG_FILE', 'sql.log'),
+    'log' => env('DB_LOG_FILE', storage_path('logs/sql.log')),
 
     'days' => env('DB_LOG_DAYS', 7),
 
