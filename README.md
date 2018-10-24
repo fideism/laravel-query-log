@@ -1,5 +1,6 @@
 # laravel-query-log
 
+[![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://github.com/fideism/laravel-query-log/blob/master/README.md)
 [![Build Status](https://travis-ci.org/fideism/laravel-query-log.svg?branch=master)](https://travis-ci.org/fideism/laravel-query-log)
 
 Log Datagase Query Messages
