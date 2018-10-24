@@ -44,7 +44,21 @@ class ServiceProvider extends BaseServiceProvider
 
         $this->databaseEvents();
 
-        $this->logQuery();
+        $this->listenEvents();
+
+        $this->terminate();
+    }
+
+    /**
+     * App Terminate Log
+     */
+    protected function terminate()
+    {
+        // App::finish Knowing that it is old
+        // Can be used anywhere you can access the $app instance
+        $this->app->terminating(function () {
+            $this->logQuery();
+        });
     }
 
     /**
@@ -54,13 +68,13 @@ class ServiceProvider extends BaseServiceProvider
     {
         $message = new QueryMessage($this->app['database.events']);
 
-        $log = $message->logMessage();
+        $logs = $message->logMessage();
 
-        if (empty($log)) {
+        if (empty($logs)) {
             return;
         }
 
-        $this->app['database.log']->log($this->level(), $log);
+        $this->app['database.log']->log($this->level(), "\n" . implode("\n", $logs));
     }
 
     /**
@@ -81,7 +95,13 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->singleton('database.events', function () {
             return Collection::make();
         });
+    }
 
+    /**
+     * Listen Database Events
+     */
+    protected function listenEvents()
+    {
         foreach ($this->getEvents() as $event) {
             $this->app['events']->listen($event, function ($event) {
                 $this->app['database.events']->push($event);

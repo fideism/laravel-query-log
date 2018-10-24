@@ -10,9 +10,14 @@ use Illuminate\Database\Events\TransactionRolledBack;
 
 class QueryMessage
 {
+    /**
+     * @var Collection
+     */
     protected $events;
+
     /**
      * QueryMessage constructor.
+     * 
      * @param Collection $events
      */
     public function __construct(Collection $events)
@@ -25,7 +30,7 @@ class QueryMessage
      */
     public function logMessage()
     {
-        $log = '';
+        $log = [];
 
         if ($this->events->isEmpty()) {
             return $log;
@@ -33,19 +38,19 @@ class QueryMessage
 
         foreach ($this->events as $event) {
             if ($event instanceof QueryExecuted) {
-                $log .= $this->formatQueryExecuted($event);
+                $log[] = $this->formatQueryExecuted($event);
             }
 
             if ($event instanceof TransactionBeginning) {
-                $log .= $this->formatTransactionBegin($event);
+                $log[] = $this->formatTransactionBegin($event);
             }
 
             if ($event instanceof TransactionCommitted) {
-                $log .= $this->formatTransactionCommit($event);
+                $log[] = $this->formatTransactionCommit($event);
             }
 
             if ($event instanceof  TransactionRolledBack) {
-                $log .= $this->formatTransactionRollback($event);
+                $log[] = $this->formatTransactionRollback($event);
             }
         }
 
@@ -58,7 +63,7 @@ class QueryMessage
      */
     protected function formatTransactionCommit(TransactionCommitted $event)
     {
-        return sprintf("\n [Transaction commit] [%s]", $event->connectionName);
+        return sprintf("[Transaction commit] [%s]", $event->connectionName);
     }
 
     /**
@@ -67,7 +72,7 @@ class QueryMessage
      */
     protected function formatTransactionRollback(TransactionRolledBack $event)
     {
-        return sprintf("\n [Transaction rollback] [%s]", $event->connectionName);
+        return sprintf("[Transaction rollback] [%s]", $event->connectionName);
     }
 
     /**
@@ -76,7 +81,7 @@ class QueryMessage
      */
     protected function formatTransactionBegin(TransactionBeginning $event)
     {
-        return sprintf("\n [Transaction begin] [%s]", $event->connectionName);
+        return sprintf("[Transaction begin] [%s]", $event->connectionName);
     }
 
     /**
@@ -110,6 +115,6 @@ class QueryMessage
             }
         }
 
-        return sprintf("\n%s [%s][%s]", $sql, $event->connectionName, $event->time);
+        return sprintf("%s [%s][%sms]", $sql, $event->connectionName, $event->time);
     }
 }
