@@ -1,5 +1,7 @@
 # laravel-query-log
 
+[![Build Status](https://travis-ci.org/fideism/laravel-query-log.svg?branch=master)](https://travis-ci.org/fideism/laravel-query-log)
+
 Log Datagase Query Messages
 
 ## Install
