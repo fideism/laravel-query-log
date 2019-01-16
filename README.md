@@ -18,7 +18,7 @@ DB_DEBUG=true
 - Other Configurations
 ```shell
 DB_DEBUG=single         //single Or daily default single
-DB_LOG_FILE=xx          //default storage_path('logs/sql.log')
+DB_LOG_FILE=xxx          //default storage_path('logs/sql.log')
 DB_LOG_DAYS=7           //default 7
 DB_LOG_LEVEL=debug      //default debug
 DB_EXPLAIN=false      //default false;show select query explain
