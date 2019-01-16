@@ -7,7 +7,7 @@ Log Datagase Query Messages
 
 ## Install
 ```shell
-composer require fideism/laravel-query-log:^1.0
+composer require fideism/laravel-query-log:^1.1
 ```
 
 ## Configuration
