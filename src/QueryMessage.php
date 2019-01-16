@@ -44,7 +44,7 @@ class QueryMessage
     public function logMessage()
     {
         if ($this->events->isEmpty()) {
-            return $this->log;
+            return $this->logs;
         }
 
         foreach ($this->events as $event) {
