@@ -11,4 +11,7 @@ return [
     'days' => env('DB_LOG_DAYS', 7),
 
     'level' => env('DB_LOG_LEVEL', 'debug'),
+
+    'explain' => env('DB_EXPLAIN', false)
 ];
+

@@ -66,7 +66,7 @@ class ServiceProvider extends BaseServiceProvider
      */
     protected function logQuery()
     {
-        $message = new QueryMessage($this->app['database.events']);
+        $message = new QueryMessage($this->app['database.events'], $this->explain());
 
         $logs = $message->logMessage();
 
@@ -85,6 +85,16 @@ class ServiceProvider extends BaseServiceProvider
     protected function debug()
     {
         return $this->app['config']['database-log']['debug'];
+    }
+
+    /**
+     * Log Explain
+     * 
+     * @return mixed
+     */
+    protected function explain()
+    {
+        return $this->app['config']['database-log']['explain'];
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Fideism\DatabaseLog;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
@@ -16,13 +17,25 @@ class QueryMessage
     protected $events;
 
     /**
-     * QueryMessage constructor.
-     * 
-     * @param Collection $events
+     * @var array
      */
-    public function __construct(Collection $events)
+    private $logs = [];
+
+    /**
+     * @var bool
+     */
+    private $explain;
+
+    /**
+     * QueryMessage constructor.
+     *
+     * @param Collection $events
+     * @param bool $explain
+     */
+    public function __construct(Collection $events, bool $explain = false)
     {
         $this->events = $events;
+        $this->explain = $explain;
     }
 
     /**
@@ -30,31 +43,29 @@ class QueryMessage
      */
     public function logMessage()
     {
-        $log = [];
-
         if ($this->events->isEmpty()) {
-            return $log;
+            return $this->log;
         }
 
         foreach ($this->events as $event) {
             if ($event instanceof QueryExecuted) {
-                $log[] = $this->formatQueryExecuted($event);
+                $this->formatQueryExecuted($event);
             }
 
             if ($event instanceof TransactionBeginning) {
-                $log[] = $this->formatTransactionBegin($event);
+                $this->logs[] = $this->formatTransactionBegin($event);
             }
 
             if ($event instanceof TransactionCommitted) {
-                $log[] = $this->formatTransactionCommit($event);
+                $this->logs[] = $this->formatTransactionCommit($event);
             }
 
             if ($event instanceof  TransactionRolledBack) {
-                $log[] = $this->formatTransactionRollback($event);
+                $this->logs[] = $this->formatTransactionRollback($event);
             }
         }
 
-        return $log;
+        return $this->logs;
     }
 
     /**
@@ -115,6 +126,33 @@ class QueryMessage
             }
         }
 
-        return sprintf("%s [%s][%sms]", $sql, $event->connectionName, $event->time);
+        $this->logs[] = sprintf("%s [%s][%sms]", $sql, $event->connectionName, $event->time);
+
+        $this->selectExplain($sql);
+    }
+
+    /**
+     * explain select sql
+     *
+     * @param string $sql
+     */
+    protected function selectExplain(string $sql)
+    {
+        if (! $this->explain) {
+            return;
+        }
+
+        $pos = mb_stripos($sql, 'SELECT', 0);
+        if ($pos === false || $pos != 0) {
+            return;
+        }
+
+        $explain = DB::select('EXPLAIN ' . $sql);
+
+        foreach ($explain as $item) {
+            $message = get_object_vars($item);
+            $this->logs[] = sprintf('EXPLAIN：%s', json_encode($message));
+        }
+
     }
 }
