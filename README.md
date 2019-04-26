@@ -31,11 +31,26 @@ select `id` from `users` where `gender` = '1' order by `created_at` desc [mysql]
 select `id`,`url` from `user_profiles` where `user_id` = '1' order by `created_at` desc [mysql][0.18ms]
 ```
 
-- With Explain
+- With Explain (Mysql)
 ```
 [2019-01-16 11:23:53] database.sql.DEBUG: 
 select `id` from `users` where `gender` = '1' order by `created_at` desc [mysql][1.93ms]
-EXPLAIN：{"id":1,"select_type":"SIMPLE","table":"articles","partitions":null,"type":"ALL","possible_keys":null,"key":null,"key_len":null,"ref":null,"rows":11,"filtered":9.090909004211426,"Extra":"Using where; Using filesort"}
+EXPLAIN：
+{"id":1,"select_type":"SIMPLE","table":"articles","partitions":null,"type":"ALL","possible_keys":null,"key":null,"key_len":null,"ref":null,"rows":11,"filtered":9.090909004211426,"Extra":"Using where; Using filesort"}
 select `id`,`url` from `user_profiles` where `user_id` = '1' order by `created_at` desc [mysql][0.18ms]
-EXPLAIN：{"id":1,"select_type":"SIMPLE","table":"articles","partitions":null,"type":"ALL","possible_keys":null,"key":null,"key_len":null,"ref":null,"rows":11,"filtered":9.090909004211426,"Extra":"Using where; Using filesort"}
+EXPLAIN：
+{"id":1,"select_type":"SIMPLE","table":"articles","partitions":null,"type":"ALL","possible_keys":null,"key":null,"key_len":null,"ref":null,"rows":11,"filtered":9.090909004211426,"Extra":"Using where; Using filesort"}
+```
+
+- With Explain (Mysql)
+```
+select * from "customer"."recharge_rules" where "branch_id" = '9a0336e6-403d-427f-be42-829416ba4763' and "is_valid" = '1' [pgsql][1.44ms]
+EXPLAIN:
+{"QUERY PLAN":"Index Scan using customer_recharge_rules_branch_id_index on recharge_rules  (cost=0.14..8.16 rows=1 width=1146)"}
+{"QUERY PLAN":"  Index Cond: (branch_id = '9a0336e6-403d-427f-be42-829416ba4763'::uuid)"}
+{"QUERY PLAN":"  Filter: (is_valid = 1::smallint)"}
+select * from "customer"."users" where "customer"."users"."id" = '8d824494-16c2-49f1-b06a-f9c392c2023c' limit 1 [customer][1.78ms]
+{"QUERY PLAN":"Limit  (cost=0.14..8.15 rows=1 width=2248)"}
+{"QUERY PLAN":"  ->  Index Scan using users_pkey on users  (cost=0.14..8.15 rows=1 width=2248)"}
+{"QUERY PLAN":"        Index Cond: (id = '8d824494-16c2-49f1-b06a-f9c392c2023c'::uuid)"}
 ```

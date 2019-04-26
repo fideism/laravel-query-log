@@ -2,7 +2,6 @@
 
 namespace Fideism\DatabaseLog;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
@@ -128,15 +127,16 @@ class QueryMessage
 
         $this->logs[] = sprintf("%s [%s][%sms]", $sql, $event->connectionName, $event->time);
 
-        $this->selectExplain($sql);
+        $this->selectExplain($event, $sql);
     }
 
     /**
      * explain select sql
      *
+     * @param QueryExecuted $event
      * @param string $sql
      */
-    protected function selectExplain(string $sql)
+    protected function selectExplain(QueryExecuted $event, string $sql)
     {
         if (! $this->explain) {
             return;
@@ -147,12 +147,12 @@ class QueryMessage
             return;
         }
 
-        $explain = DB::select('EXPLAIN ' . $sql);
+        $explain = $event->connection->select('EXPLAIN ' . $sql);
 
+        $this->logs[] = 'EXPLAIN:';
         foreach ($explain as $item) {
             $message = get_object_vars($item);
-            $this->logs[] = sprintf('EXPLAIN：%s', json_encode($message));
+            $this->logs[] = json_encode($message);
         }
-
     }
 }
