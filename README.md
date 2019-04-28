@@ -7,7 +7,7 @@ Log Datagase Query Messages
 
 ## Install
 ```shell
-composer require fideism/laravel-query-log:^1.1
+composer require fideism/laravel-query-log:^1.0
 ```
 
 ## Configuration
@@ -43,7 +43,7 @@ EXPLAIN：
 {"id":1,"select_type":"SIMPLE","table":"articles","partitions":null,"type":"ALL","possible_keys":null,"key":null,"key_len":null,"ref":null,"rows":11,"filtered":9.090909004211426,"Extra":"Using where; Using filesort"}
 ```
 
-- With Explain (Mysql)
+- With Explain (Pgsql)
 ```
 select * from "customer"."recharge_rules" where "branch_id" = '9a0336e6-403d-427f-be42-829416ba4763' and "is_valid" = '1' [pgsql][1.44ms]
 EXPLAIN:
