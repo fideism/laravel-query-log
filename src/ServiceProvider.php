@@ -12,6 +12,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionRolledBack;
+use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
@@ -34,19 +35,21 @@ class ServiceProvider extends BaseServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/database.php', 'database-log');
 
-        if (! $this->debug()) {
-            return;
+        if ($this->dbDebug()) {
+            $this->app->singleton('database.log', function () {
+                return $this->createLog();
+            });
+
+            $this->databaseEvents();
+
+            $this->listenEvents();
+
+            $this->terminate();
         }
 
-        $this->app->singleton('database.log', function () {
-            return $this->createLog();
-        });
-
-        $this->databaseEvents();
-
-        $this->listenEvents();
-
-        $this->terminate();
+        if ($this->dbRequest()) {
+            $this->app['events']->listen(RequestHandled::class, [$this, 'recordRequest']);
+        }
     }
 
     /**
@@ -62,11 +65,21 @@ class ServiceProvider extends BaseServiceProvider
     }
 
     /**
+     * @param RequestHandled $event
+     */
+    public function recordRequest(RequestHandled $event)
+    {
+        $message = (new RequestMessage($event))->message();
+
+        $this->app['database.log']->log($this->level(), var_export($message, true));
+    }
+
+    /**
      * Log Query
      */
     protected function logQuery()
     {
-        $message = new QueryMessage($this->app['database.events'], $this->explain());
+        $message = new QueryMessage($this->app['database.events'], $this->dbExplain());
 
         $logs = $message->logMessage();
 
@@ -82,7 +95,7 @@ class ServiceProvider extends BaseServiceProvider
      *
      * @return mixed
      */
-    protected function debug()
+    protected function dbDebug()
     {
         return $this->app['config']['database-log']['debug'];
     }
@@ -92,9 +105,19 @@ class ServiceProvider extends BaseServiceProvider
      * 
      * @return mixed
      */
-    protected function explain()
+    protected function dbExplain()
     {
         return $this->app['config']['database-log']['explain'];
+    }
+
+    /**
+     * Log Explain
+     *
+     * @return mixed
+     */
+    protected function dbRequest()
+    {
+        return $this->app['config']['database-log']['request'];
     }
 
     /**

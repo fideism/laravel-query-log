@@ -12,6 +12,8 @@ return [
 
     'level' => env('DB_LOG_LEVEL', 'debug'),
 
-    'explain' => env('DB_EXPLAIN', false)
+    'explain' => env('DB_EXPLAIN', false),
+
+    'request' => env('DB_REQUEST', false)
 ];
 

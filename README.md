@@ -3,32 +3,44 @@
 [![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://github.com/fideism/laravel-query-log/blob/master/LICENSE)
 [![Build Status](https://travis-ci.org/fideism/laravel-query-log.svg?branch=master)](https://travis-ci.org/fideism/laravel-query-log)
 
-Log Datagase Query Messages
+Laravel Database Query Log, Request Log
 
 ## Install
 ```shell
-composer require fideism/laravel-query-log:^1.1
+composer require fideism/laravel-query-log:^1.0
 ```
 
 ## Configuration
 - Before Used, You Should Change The Configuration In `.env`
 ```shell
-DB_DEBUG=true
+DB_DEBUG=true    //control database query log
+DB_REQUEST=true  //control request log
 ```
 - Other Configurations
 ```shell
-DB_DEBUG=single         //single Or daily default single
-DB_LOG_FILE=xxx          //default storage_path('logs/sql.log')
-DB_LOG_DAYS=7           //default 7
-DB_LOG_LEVEL=debug      //default debug
+DB_DEBUG=single       //single Or daily default single
+DB_LOG_FILE=xxx       //default storage_path('logs/sql.log')
+DB_LOG_DAYS=7         //default 7
+DB_LOG_LEVEL=debug    //default debug
 DB_EXPLAIN=false      //default false;show select query explain
+DB_REQUEST=false      //default false；show request message
 ```
 ## Example
-- Default Without Explain
+- Default Without Explain & Request
 ```
 [2019-01-16 11:23:53] database.sql.DEBUG: 
 select `id` from `users` where `gender` = '1' order by `created_at` desc [mysql][1.93ms]
 select `id`,`url` from `user_profiles` where `user_id` = '1' order by `created_at` desc [mysql][0.18ms]
+```
+
+- With Request
+```
+[2019-04-28 14:30:30] database.sql.DEBUG: array (
+  'uri' => '/api/user',
+  'method' => 'GET',
+  'controller_action' => 'App\Http\Controllers\UserController@index',
+  'response_status' => 200,
+)  
 ```
 
 - With Explain (Mysql)
